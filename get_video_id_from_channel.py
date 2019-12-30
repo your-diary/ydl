@@ -57,11 +57,13 @@ def get_uploaded_videos_playlist_id(id_type, id):
     return json_dict['items'][0]['contentDetails']['relatedPlaylists']['uploads']
 
 #This function returns a list of ids of videos in a playlist specified by `playlist_id`.
-#Note that the first element of the list corresponds to the **latest** video.
+#Right after a video id matches any element in `already_retrieved_video_id_list`, the function returns.
+#In other words, the returned list only includes video ids which are scanned before the first match.
+#Note that (if `already_retrieved_video_id_list` is empty) the first element of the list corresponds to the **latest** video.
 #Per request, at most `num_max_result` ids can be got, thus this function may send multiple requests that takes a while.
 #Example:
-# print(get_all_video_id_in_playlist("UU_x5XG1OV2P6uZZ5FSM9Ttw")) #=> list of video ids
-def get_all_video_id_in_playlist(playlist_id, should_show_progress = False):
+# print(get_all_video_id_in_playlist("UU_x5XG1OV2P6uZZ5FSM9Ttw", [])) #=> list of video ids
+def get_all_video_id_in_playlist(playlist_id, already_retrieved_video_id_list, should_show_progress = False):
 
     video_id_list = []
 
@@ -97,11 +99,13 @@ def get_all_video_id_in_playlist(playlist_id, should_show_progress = False):
                 if (i == 0):
                     print("Retrieving video ids...")
                 print("    [{}/{}] Done.".format(i + 1, num_page))
-            else:
-                print(num_page)
 
         for video in json_dict['items']:
-            video_id_list.append(video['contentDetails']['videoId'])
+            video_id = video['contentDetails']['videoId']
+            if (video_id in already_retrieved_video_id_list):
+                return video_id_list
+            else:
+                video_id_list.append(video_id)
 
         if ('nextPageToken' in json_dict):
             page_info = '&pageToken=' + json_dict['nextPageToken']
@@ -133,9 +137,9 @@ def get_video_title(video_id, should_append_uploaded_date = False):
 
 if (__name__ == "__main__"):
 
-    usage_message = "Usage: python3 " + sys.argv[0] + " {{--username <user name>} | {--channel-id <channel id>}}"
+    usage_message = "Usage: python3 " + sys.argv[0] + " {{--username <user name>} | {--channel-id <channel id>}} <output file name>"
 
-    if (len(sys.argv) != 3):
+    if (len(sys.argv) != 4):
         print(usage_message)
         sys.exit(0)
 
@@ -148,10 +152,30 @@ if (__name__ == "__main__"):
         print(usage_message)
         sys.exit(1)
 
+    already_retrieved_video_id_list = []
+    try:
+        with open(sys.argv[3], "r") as f_in:
+            contents = f_in.readlines()
+            for line in contents:
+                video_id = line.split(' ')[0]
+                if (video_id[0] == '#'):
+                    video_id = video_id[1:]
+                already_retrieved_video_id_list.append(video_id)
+    except:
+        pass
+
     playlist_id = get_uploaded_videos_playlist_id(id_type, sys.argv[2])
     if (playlist_id == None):
         sys.exit(1)
-    video_id_list = get_all_video_id_in_playlist(playlist_id)
-    for i in video_id_list:
-        print(i + " " + get_video_title(i, True))
+    video_id_list = get_all_video_id_in_playlist(playlist_id, already_retrieved_video_id_list, True)
+    video_id_list.reverse() #Reverse the order so that the first element corresponds to the oldest video.
+
+    try:
+        with open(sys.argv[3], "a") as f_out:
+            for i in video_id_list:
+                f_out.write(i + " " + get_video_title(i, True) + "\n")
+    except Exception as e:
+        print(e)
+        print("An error occured while opening the output file [ {} ].".format(sys.argv[3]))
+        sys.exit(1)
 
