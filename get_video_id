@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import sys
 import subprocess
 import json
@@ -7,6 +9,7 @@ import math
 API_key = "AIzaSyC0XPb0udk8HMMEa8PbYp_qZu7WONnGt3U"
 num_max_result = "50"
 
+#Currently, this function is not used.
 #Example:
 # print(convert_username_to_channel_id("GoogleDevelopers")) #=> "UC_x5XG1OV2P6uZZ5FSM9Ttw"
 def convert_username_to_channel_id(username):
@@ -203,4 +206,6 @@ if (__name__ == "__main__"):
             print(e)
             print("An error occured while opening [ {} ].".format(sys.argv[3]))
             sys.exit(1)
+
+# vim: syntax=py
 

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+file="./.ydl_video_id_list.txt"
+get_video_id "$1" "$2" "${file}" && ydl "${file}"
+
+# vim: syntax=sh
+

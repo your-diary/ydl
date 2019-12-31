@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
     signal(SIGUSR1, prm::signal_handler);
 
     if (argc != 2) {
-        cout << "Usage: " << argv[0] << " <input file name>" << "\n";
+        cout << "Usage:\n  " << argv[0] << " <input file name>" << "\n";
         return 1;
     }
 
@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
 
         ifstream ifs(argv[1]);
         if (!ifs) {
-            cout << "Couldn't open file [ " << argv[1] << " ].\n";
+            cout << "Couldn't open the file [ " << argv[1] << " ].\n";
             return 1;
         }
 
@@ -83,13 +83,23 @@ int main(int argc, char **argv) {
 
     vector<int> exit_status_list(video_id_list.size(), 0);
 
+    unsigned num_should_download = video_id_list.size();
+    for (int i = 0; i < video_id_list.size(); ++i) {
+        if (video_id_list[i][0] == prm::comment_char) {
+            --num_should_download;
+        }
+    }
+    unsigned download_index = 0;
+
     for (int i = 0; i < video_id_list.size(); ++i) {
 
         if (video_id_list[i][0] == prm::comment_char) {
             continue;
         }
 
-        cout << "------------ " << video_id_list[i] << " start ------------\n";
+        ++download_index;
+
+        cout << "------------ [" << download_index << "/" << num_should_download << "] " << video_id_list[i] << " start ------------\n";
 
         string title = prm::fullwidthize_slashes(title_list[i]);
 
@@ -100,7 +110,7 @@ int main(int argc, char **argv) {
 
         exit_status_list[i] = system(command.str().c_str());
 
-        cout << "------------ " << video_id_list[i] << " end ------------\n";
+        cout << "------------- [" << download_index << "/" << num_should_download << "] " << video_id_list[i] << " end -------------\n";
 
         if (exit_status_list[i] != 0 || prm::has_SIGINT_caught == true) {
             break;
