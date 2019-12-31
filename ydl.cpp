@@ -110,11 +110,12 @@ int main(int argc, char **argv) {
 
         exit_status_list[i] = system(command.str().c_str());
 
-        cout << "------------- [" << download_index << "/" << num_should_download << "] " << video_id_list[i] << " end -------------\n";
-
         if (exit_status_list[i] != 0 || prm::has_SIGINT_caught == true) {
+            cout << "--------- [" << download_index << "/" << num_should_download << "] " << video_id_list[i] << " interrupted ---------\n";
             break;
         }
+
+        cout << "------------- [" << download_index << "/" << num_should_download << "] " << video_id_list[i] << " end -------------\n";
 
     }
         

@@ -6,7 +6,7 @@
 
 *ydl* is a front end for [`youtube-dl`](https://ytdl-org.github.io/youtube-dl/index.html). ydl consists of two programs: `get_video_id` and `ydl`.
 
-`get_video_id` constructs a list of video ids associated with a username, a channel id or a playlist id, and write the list to a specified file. Each video id is appended to the file as long as it is not found in the file. This makes it possible, if you in the past called `get_video_id` with the same arguments, to *update* the file.
+`get_video_id` constructs a list of video ids associated with a username, a channel id or a playlist id, and writes the list to a specified file. Each video id is appended to the file as long as it is not found in the file. This makes it possible, if you in the past called `get_video_id` with the same arguments, to *update* the file.
 
 `ydl` reads a specified file to construct a list of video ids and then makes `youtube-dl` download videos according to the list. When a video is successfully downloaded, the video id corresponding to it is prepended with a number sign `#`, which indicates "you have already downloaded the video". By that, you can suspend and resume the operation (without re-downloading anything), or only download newly uploaded videos after updating the list file by `get_video_id`.
 
@@ -22,7 +22,7 @@ $ cd Apple_video/
 
 2. Retrieve video ids and write them to a file.
 
-As the URL suggests, the username of the channel is `Apple`.
+As the channel URL suggests, the username of the channel is `Apple`.
 ```bash
 $ get_video_id --username Apple video_id_list.txt
 Retrieving the playlist id...
@@ -68,10 +68,10 @@ WARNING: Requested formats are incompatible for merge and will be merged into mk
 [download] Destination: Apple - Making the Mac Pro_2013-10-23T17:36:21.000Z.f137.mp4
 [download]  81.5% of 24.82MiB at  8.83MiB/s ETA 00:00^C
 ERROR: Interrupted by user
-------------- [2/315] IbWOQWw1wkM end -------------
+--------- [2/315] IbWOQWw1wkM interrupted ---------
 ```
 
-Here you cancelled the operation by pressing Ctrl+c while downloading the second video. Since the first video has successfully been downloaded, its video id is commented out with `#`.
+Here you cancelled the operation by pressing Ctrl+c (i.e. sending `SIGINT` to the foreground process group) while downloading the second video. Since the first video has successfully been downloaded, its video id is commented out with `#`.
 ```bash
 $ head -n 3 video_id_list.txt 
 #yBX-KpMoxYk Apple Special Event. September 10, 2013._2013-10-09T04:33:09.000Z
@@ -100,7 +100,7 @@ Deleting original file Apple - Making the Mac Pro_2013-10-23T17:36:21.000Z.f251.
 
 4. Update the list and fetch newly uploaded videos.
 
-A month has passed since the third step. Now you want to fetch newly uploaded videos. Necessarily commands are exactly same as before.
+A month has passed since the previous step. Now you want to fetch newly uploaded videos. Necessarily commands are exactly same as before.
 ```bash
 $ get_video_id --username Apple video_id_list.txt
 Retrieving the playlist id...
@@ -127,7 +127,7 @@ Deleting original file Group slofie on iPhone 11 — Apple_2019-12-28T20:00:04.0
 
 ### Example 2
 
-Although it is simple enough to use combinations of `get_video_id` and `ydl`, you may sometimes be so lazy that typing two commands, considering a good file name or pass it manually as an argument feels troublesome. If that the case, and if you never mind about a file name associated with the list, you can use `easy_ydl` command.
+Although it is simple enough to use the combination of `get_video_id` and `ydl`, you may sometimes be so lazy that typing two commands, considering a good file name or pass it manually as an argument feels troublesome. If that the case, and if you never mind about a file name associated with the list, you can simply use `easy_ydl` command. As described in [Usage](#usage),
 ```bash
 $ easy_ydl --username Apple
 ```
@@ -173,6 +173,14 @@ get_video_id "$1" "$2" "${file}" && ydl "${file}"
 
 ## Installation
 
+The program is tested under
+
+- [Arch Linux](https://www.archlinux.org/)
+
+- [Arch Linux ARM](https://archlinuxarm.org/)
+
+- [Linux Mint 19](https://linuxmint.com/)
+
 ### Requirement
 
 - A POSIX-compatible shell (e.g. [bash](https://www.gnu.org/software/bash/))
@@ -189,7 +197,7 @@ get_video_id "$1" "$2" "${file}" && ydl "${file}"
 
 1. Get an API key for [*YouTube Data API*](https://developers.google.com/youtube).
 
-To use ydl, an API key for YouTube DATA API is needed. It is easily and freely got. See [here](https://developers.google.com/youtube/v3/getting-started#before-you-start) for a brief instructions. After you get an key (like `AIpaSyCaXPx0utk8HmM4a8PbYp_qeu7wOknGT3U`), store it in `.ydl_api_key` file under your home directory.
+To use ydl, an API key for YouTube DATA API is needed. It is easily and freely got. See [here](https://developers.google.com/youtube/v3/getting-started#before-you-start) for brief instructions. After you get an key (like `AIpaSyCaXPx0utk8HmM4a8PbYp_qeu7wOknGT3U`), store it in `.ydl_api_key` file under your home directory.
 
 ```bash
 $ echo "AIpaSyCaXPx0utk8HmM4a8PbYp_qeu7wOknGT3U" > ~/.ydl_api_key
@@ -201,7 +209,7 @@ You can use `git clone <URL of this page>` command or press a download button on
 
 3. Change shebangs as you like.
 
-There exists a shebang line in `get_video_id` and `easy_ydl`.
+There exists a [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix)) line in `get_video_id` and `easy_ydl`.
 ```bash
 $ head -n 1 get_video_id easy_ydl
 ==> get_video_id <==
@@ -229,9 +237,9 @@ $ make uninstall
 
 - Do I have to prepare *N* files if I'd like to track *N* channels?
 
-No. It is possible to associate multiple usernames, channel ids or playlist ids with a single list. Just execute `video_id_list` multiple times with different `<playlist spec>` but with the same `<output file name>`.
+No. It is possible to associate multiple usernames, channel ids or playlist ids with a single list. Just execute `video_id_list` multiple times with different `<playlist spec>`s but with the same `<output file name>`.
 
-- I'd like to execute ydl on a server.
+- I'd like to execute ydl on a server. What is a good way?
 
 Say you have a computer and a headless server which can be accessed by the computer via SSH. When a download operation takes more than a day (yes, it often does), you may want to leave it to the server, shutdown the computer and lay down on a bed. This is a usual way:
 ```bash
@@ -252,7 +260,7 @@ Opening [ video_id_list.txt ]...
 Appending 315 new video ids to the file...
 Done.
 
-$$ ydl video_id_list.txt > ydl_log 2>&1 &
+$$ ydl video_id_list.txt > ydl_log 2>&1 & #Execute as a background job and redirect all to `ydl_log` file.
 [1] 24535
 
 $$ disown #Now you can logout from the server without terminating the operation.

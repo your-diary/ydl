@@ -160,7 +160,7 @@ if (__name__ == "__main__"):
             API_key = API_key[:-1] #remove the last newline
     except Exception as e:
         print(e)
-        print("An error occured while opening [ {} ].".format(api_key_file))
+        print("An error occurred while opening [ {} ].".format(api_key_file))
         sys.exit(1)
 
     if (len(sys.argv) != 4):
@@ -215,7 +215,7 @@ if (__name__ == "__main__"):
                 print("Done.")
         except Exception as e:
             print(e)
-            print("An error occured while opening [ {} ].".format(sys.argv[3]))
+            print("An error occurred while opening [ {} ].".format(sys.argv[3]))
             sys.exit(1)
 
 # vim: syntax=py
