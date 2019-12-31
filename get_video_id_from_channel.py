@@ -72,9 +72,12 @@ def get_all_video_id_in_playlist(playlist_id, already_retrieved_video_id_list, s
     if (should_show_progress):
         num_total_result = 0
         num_page = 0
-        i = -1
+
+    i = -1
 
     while (True):
+
+        i += 1
 
         command = [
             'curl',
@@ -87,17 +90,17 @@ def get_all_video_id_in_playlist(playlist_id, already_retrieved_video_id_list, s
         output = subprocess.check_output(command)
         json_dict = json.loads(output)
 
-        if (should_show_progress):
+        if (i == 0 and not 'items' in json_dict):
+            print("There exists no channel specified by [ {} ].".format(playlist_id))
+            return
 
-            i += 1
+        if (should_show_progress):
 
             if (i == 0):
                 num_total_result = int(json_dict['pageInfo']['totalResults'])
                 num_page = math.ceil(num_total_result / int(num_max_result))
 
             if (num_page > 1):
-                if (i == 0):
-                    print("Retrieving video ids...")
                 print("    [{}/{}] Done.".format(i + 1, num_page))
 
         for video in json_dict['items']:
@@ -137,7 +140,14 @@ def get_video_title(video_id, should_append_uploaded_date = False):
 
 if (__name__ == "__main__"):
 
-    usage_message = "Usage: python3 " + sys.argv[0] + " {{--username <user name>} | {--channel-id <channel id>}} <output file name>"
+    usage_message = "Usage:\n\
+  python3 " + sys.argv[0] + " <playlist spec> <output file name>\n\
+\n\
+<playlist spec>:\n\
+  --username <user name>         specify all uploaded videos by <user name>\n\
+  --channel-id <channel id>      specify all uploaded videos in <channel id>\n\
+  --playlist-id <playlist id>    specify all videos in <playlist id>\
+"
 
     if (len(sys.argv) != 4):
         print(usage_message)
@@ -147,6 +157,9 @@ if (__name__ == "__main__"):
         id_type = "username"
     elif (sys.argv[1] == "--channel-id"):
         id_type = "channel_id"
+    elif (sys.argv[1] == "--playlist-id"):
+        id_type = "playlist_id"
+        playlist_id = sys.argv[2]
     else:
         print("Invalid option [ {} ] was passed.".format(sys.argv[1]))
         print(usage_message)
@@ -164,18 +177,30 @@ if (__name__ == "__main__"):
     except:
         pass
 
-    playlist_id = get_uploaded_videos_playlist_id(id_type, sys.argv[2])
-    if (playlist_id == None):
-        sys.exit(1)
+    if (id_type != "playlist_id"):
+        print("Retrieving the playlist id...")
+        playlist_id = get_uploaded_videos_playlist_id(id_type, sys.argv[2])
+        if (playlist_id == None):
+            sys.exit(1)
+
+    print("Retrieving video ids...")
     video_id_list = get_all_video_id_in_playlist(playlist_id, already_retrieved_video_id_list, True)
+    if (video_id_list == None):
+        sys.exit(1)
     video_id_list.reverse() #Reverse the order so that the first element corresponds to the oldest video.
 
-    try:
-        with open(sys.argv[3], "a") as f_out:
-            for i in video_id_list:
-                f_out.write(i + " " + get_video_title(i, True) + "\n")
-    except Exception as e:
-        print(e)
-        print("An error occured while opening the output file [ {} ].".format(sys.argv[3]))
-        sys.exit(1)
+    if (len(video_id_list) == 0):
+        print("No new video id is appended to [ {} ].".format(sys.argv[3]))
+    else:
+        print("Opening [ {} ]...".format(sys.argv[3]))
+        try:
+            with open(sys.argv[3], "a") as f_out:
+                print("Appending {} new video ids to the file...".format(len(video_id_list)))
+                for i in video_id_list:
+                    f_out.write(i + " " + get_video_title(i, True) + "\n")
+                print("Done.")
+        except Exception as e:
+            print(e)
+            print("An error occured while opening [ {} ].".format(sys.argv[3]))
+            sys.exit(1)
 
