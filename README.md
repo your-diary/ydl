@@ -168,7 +168,7 @@ Usage:
 This command is implemented as below.
 ```bash
 $ cat easy_ydl
-#!/bin/sh
+#!/usr/bin/env sh
 file="./.ydl_video_id_list.txt"
 get_video_id "$1" "$2" "${file}" && ydl "${file}"
 ```
@@ -209,19 +209,23 @@ $ echo "AIpaSyCaXPx0utk8HmM4a8PbYp_qeu7wOknGT3U" > ~/.ydl_api_key
 
 You can use `git clone <URL of this page>` command or press a download button on this webpage.
 
-3. Change shebangs as you like.
+3. Change shebang lines if needed.
 
 There exists a [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix)) line in `get_video_id` and `easy_ydl`.
 ```bash
 $ head -n 1 get_video_id easy_ydl
 ==> get_video_id <==
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 ==> easy_ydl <==
-#!/bin/sh
+#!/usr/bin/env sh
 ```
 
-The paths may be inappropriate for your environment. If that the case, replace them with the correct paths.
+Their contents may be inappropriate for your environment.
+
+- With low probability, `env` command is not located in `/usr/bin`. Check that with `which -a env` command or `type -a env` command. If the location is incorrect, replace `/usr/bin/env` with the correct path.
+
+- With sufficiently high probability, a name of Python 3 interpreter is not `python3`. In that case, replace `python3` with the correct name (possibly `python`).
 
 ### Installation
 

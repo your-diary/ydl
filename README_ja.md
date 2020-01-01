@@ -168,7 +168,7 @@ Usage:
 このコマンドは、次のように実装されています。
 ```bash
 $ cat easy_ydl
-#!/bin/sh
+#!/usr/bin/env sh
 file="./.ydl_video_id_list.txt"
 get_video_id "$1" "$2" "${file}" && ydl "${file}"
 ```
@@ -209,19 +209,23 @@ $ echo "AIpaSyCaXPx0utk8HmM4a8PbYp_qeu7wOknGT3U" > ~/.ydl_api_key
 
 `git clone <URL of this page>`コマンドを使うか、このページのダウンロードボタンを押してください。
 
-3. シェバンを任意に変更する。
+3. 必要であれば、シェバン行を書き換える
 
-`get_video_id`と`easy_ydl`には、[シェバン](https://en.wikipedia.org/wiki/Shebang_(Unix))の行があります。
+`get_video_id`と`easy_ydl`には、[シェバン](https://en.wikipedia.org/wiki/Shebang_(Unix))行があります。
 ```bash
 $ head -n 1 get_video_id easy_ydl
 ==> get_video_id <==
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 ==> easy_ydl <==
-#!/bin/sh
+#!/usr/bin/env sh
 ```
 
-環境によっては、これらパスは不適切な可能性があります。その場合、正しいパスに書き換えてください。
+環境によっては、その内容が不適切な可能性があります。
+- 低い確率で、`env`コマンドは`/usr/bin`に位置していません。その確認には、`which -a env`コマンドまたは`type -a env`コマンドを用いてください。位置が誤っていれば、`/usr/bin/env`を正しいパスで置き換えてください。
+
+- 十分に高い確率で、Python 3インタープリタの名前は`python3`ではありません。その場合、`python3`を正しい名前(もしかすると`python`)に置き換えてください。
+
 
 ### インストール
 
