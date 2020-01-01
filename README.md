@@ -1,5 +1,7 @@
 # *ydl*, a front end for `youtube-dl`
 
+See [README_ja.md](./README_ja.md) for a Japanese :jp: version.
+
 ## Introduction
 
 ### What can *ydl* do?
@@ -79,7 +81,7 @@ IbWOQWw1wkM Apple - Making the Mac Pro_2013-10-23T17:36:21.000Z
 4FunXnJQxYU Apple Special Event. October 22, 2013._2013-10-23T21:09:58.000Z
 ```
 
-When you again execute `ydl` command, an operation starts with the second video.
+Thus, when you again execute `ydl` command, an operation starts with the second video.
 ```bash
 $ ydl video_id_list.txt 
 ------------ [1/314] IbWOQWw1wkM start ------------
@@ -100,7 +102,7 @@ Deleting original file Apple - Making the Mac Pro_2013-10-23T17:36:21.000Z.f251.
 
 4. Update the list and fetch newly uploaded videos.
 
-A month has passed since the previous step. Now you want to fetch newly uploaded videos. Necessarily commands are exactly same as before.
+A month has passed since the previous step. Now you want to fetch newly uploaded videos since then. Necessarily commands are exactly same as before.
 ```bash
 $ get_video_id --username Apple video_id_list.txt
 Retrieving the playlist id...
@@ -235,13 +237,13 @@ $ make uninstall
 
 ## Q&A
 
-- Do I have to prepare *N* files if I'd like to track *N* channels?
+- Do I have to prepare *N* list files if I'd like to track *N* channels?
 
 No. It is possible to associate multiple usernames, channel ids or playlist ids with a single list. Just execute `video_id_list` multiple times with different `<playlist spec>`s but with the same `<output file name>`.
 
 - I'd like to execute ydl on a server. What is a good way?
 
-Say you have a computer and a headless server which can be accessed by the computer via SSH. When a download operation takes more than a day (yes, it often does), you may want to leave it to the server, shutdown the computer and lay down on a bed. This is a usual way:
+Say you have a computer and a headless server which can be accessed by the computer via SSH. When a download operation takes more than a day (yes, it often does), you may want to leave it to the server, shutdown the computer and lay down on a bed. In such a situation, these commands are useful.
 ```bash
 $ ssh <host>
 
