@@ -21,7 +21,7 @@
 
 ## はじめに<a name="introduction"></a>
 
-### *ydl*とは
+### *ydl*とは<a name="what-can-ydl-do"></a>
 
 *ydl*は、[`youtube-dl`](https://ytdl-org.github.io/youtube-dl/index.html)のフロントエンドです。ydlは二つのプログラム`get_video_id`、`ydl`から構成されます。
 
