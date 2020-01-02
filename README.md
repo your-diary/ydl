@@ -1,6 +1,6 @@
 # *ydl*, a front end for `youtube-dl`
 
-See [README_ja.md](./README_ja.md) for a Japanese :jp: version.
+日本語版 :jp: が[README_ja.md](./README_ja.md)から見られます。 (See [README_ja.md](./README_ja.md) for a Japanese :jp: version.)
 
 ## Index
 

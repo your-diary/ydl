@@ -1,6 +1,6 @@
 # *ydl*, a front end for `youtube-dl`
 
-この文書は、オリジナルの[README.md](./README.md)(英語)の日本語訳です。特に理由が無ければ、オリジナルを参照することをおすすめします。
+この文書は、オリジナルの[README.md](./README.md)(英語)の日本語訳 :jp: です。特に理由が無ければ、オリジナルを参照することをおすすめします。 (This document is a Japanese :jp: translation of original [README.md](./README.md).)
 
 ## 目次
 
