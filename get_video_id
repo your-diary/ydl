@@ -136,6 +136,10 @@ def get_video_title(video_id, should_append_uploaded_date = False):
     output = subprocess.check_output(command)
     json_dict = json.loads(output)
 
+    if (json_dict['items'] == []):
+        print("Failed in retrieving a video id for [ {} ]. The video may have been deleted.".format(video_id))
+        return
+
     title = json_dict['items'][0]['snippet']['title']
     if (should_append_uploaded_date):
         title += "_" + json_dict['items'][0]['snippet']['publishedAt']
@@ -211,7 +215,11 @@ if (__name__ == "__main__"):
             with open(sys.argv[3], "a") as f_out:
                 print("Appending {} new video ids to the file...".format(len(video_id_list)))
                 for i in video_id_list:
-                    f_out.write(i + " " + get_video_title(i, True) + "\n")
+                    title = get_video_title(i, True)
+                    if (title == None):
+                        continue
+                    else:
+                        f_out.write(i + " " + title + "\n")
                 print("Done.")
         except Exception as e:
             print(e)
