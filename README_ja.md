@@ -18,6 +18,7 @@
     3. [準備](#preparation)
     4. [インストール](#installation)
 4. [Q&A](#qa)
+5. [コントリビューション](#contribution)
 
 ## はじめに<a name="introduction"></a>
 
@@ -217,6 +218,8 @@ fi
 
 - [OS X 10.10 Yosemite](https://en.wikipedia.org/wiki/OS_X_Yosemite)
 
+- Windows 10 ([WSL](https://docs.microsoft.com/ja-jp/windows/wsl/install-win10)インストール済み)
+
 ### 要件<a name="requirement"></a>
 
 - POSIX互換のシェル(例えば[bash](https://www.gnu.org/software/bash/))
@@ -275,9 +278,13 @@ $ make uninstall
 
 ## Q&A
 
-- `make`がエラーメッセージ"*Makefile:16: *** missing separator.  Stop.*"と共に失敗します。どうすれば解決できますか。
+- `make`がエラーメッセージ"*Makefile:16: *** missing separator.  Stop.*"と共に失敗します。
 
 macOSにおいて、この問題に直面するかも知れません。その場合、まず`brew install make`を実行して、それから`make`の代わりに`gmake`を使ってください。
+
+- `get_video_id`は成功しますが、`ydl`を介しての動画のダウンロードが必ず失敗します。
+
+お使いの環境の`youtube-dl`が古い可能性があります。より新しいバージョンへの更新をお試しください。
 
 - *N*個のチャンネルを追跡するために、*N*個のリストファイルを用意する必要がありますか。
 
@@ -325,4 +332,8 @@ $$ ps -eH | grep -A 1 ydl #プロセスIDを見つける
 
 $$ kill -SIGINT 24742 #(`ydl`ではなく)`youtube-dl`をキルする
 ```
+
+## コントリビューション<a name="contribution"></a>
+
+コントリビューションは歓迎します。新機能を提案したかったり、バグを発見したとき、もしGitHub :octocat: アカウントを持っているならば、プルリクエストを送信するか、イッシューを開いてください。持っていないのであれば、[takahashi.manatsu@gmail.com](mailto:takahashi.manatsu@gmail.com)にメール :email: をお送りください。
 

@@ -18,6 +18,7 @@ See [README_ja.md](./README_ja.md) for a Japanese :jp: version.
     3. [Preparation](#preparation)
     4. [Installation](#installation)
 4. [Q&A](#qa)
+5. [Contribution](#contribution)
 
 ## Introduction
 
@@ -217,6 +218,8 @@ The program is tested under
 
 - [OS X 10.10 Yosemite](https://en.wikipedia.org/wiki/OS_X_Yosemite)
 
+- Windows 10 with [WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10) installed
+
 ### Requirement
 
 - A POSIX-compatible shell (e.g. [bash](https://www.gnu.org/software/bash/))
@@ -275,9 +278,13 @@ $ make uninstall
 
 ## Q&A
 
-- `make` fails with the error message "*Makefile:16: *** missing separator.  Stop.*". How can I solve it?
+- `make` fails with the error message "*Makefile:16: *** missing separator.  Stop.*".
 
 You may encounter this problem on macOS. In that case, first execute `brew install make` and then use `gmake` instead of `make`.
+
+- `get_video_id` succeeds but downloading videos through `ydl` always fails.
+
+That may be because `youtube-dl` on your environment is old. Try updating it to a newer version.
 
 - Do I have to prepare *N* list files if I'd like to track *N* channels?
 
@@ -325,4 +332,8 @@ $$ ps -eH | grep -A 1 ydl #find a process id
 
 $$ kill -SIGINT 24742 #kill `youtube-dl` (not `ydl`)
 ```
+
+## Contribution
+
+Contributions are welcome. When you would like to suggest a new feature or have found a bug, if you have a GitHub :octocat: account, please send a pull request or open an issue. If you don't, please send a mail :email: to [takahashi.manatsu@gmail.com](mailto:takahashi.manatsu@gmail.com).
 
