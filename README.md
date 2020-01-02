@@ -2,6 +2,23 @@
 
 See [README_ja.md](./README_ja.md) for a Japanese :jp: version.
 
+## Index
+
+1. [Introduction](#introduction)
+    1. [What can *ydl* do?](#what-can-ydl-do)
+    2. [Example 1](#example-1)
+    3. [Example 2](#example-2)
+2. [Usage](#usage)
+    1. [`get_video_id`](#get_video_id)
+    2. [`ydl`](#ydl)
+    3. [`easy_ydl`](#easy_ydl)
+3. [Build](#build)
+    1. [Tested Environment](#tested-environment)
+    2. [Requirement](#requirement)
+    3. [Preparation](#preparation)
+    4. [Installation](#installation)
+4. [Q&A](#qa)
+
 ## Introduction
 
 ### What can *ydl* do?
@@ -129,16 +146,25 @@ Deleting original file Group slofie on iPhone 11 — Apple_2019-12-28T20:00:04.0
 
 ### Example 2
 
-Although it is simple enough to use the combination of `get_video_id` and `ydl`, you may sometimes be so lazy that typing two commands, considering a good file name or pass it manually as an argument feels troublesome. If that the case, and if you never mind about a file name associated with the list, you can simply use `easy_ydl` command. As described in [Usage](#usage),
+Although it is simple enough to use the combination of `get_video_id` and `ydl`, you may sometimes be so lazy that typing two commands, considering a good file name or pass it manually as an argument feels troublesome. If that the case, and if you never mind about a file name associated with the list, you can simply use `easy_ydl` command. For example, these two sets of commands are equivalent.
 ```bash
 $ easy_ydl --username Apple
 ```
-
-is equivalent to
 ```bash
 $ file="./.ydl_video_id_list.txt"
 $ get_video_id --username Apple "${file}" && ydl "${file}"
 ```
+
+And these two are equivalent.
+```bash
+$ easy_ydl
+```
+```bash
+$ file="./.ydl_video_id_list.txt"
+$ ydl "${file}"
+```
+
+The detail is explained in [Usage](#easy_ydl).
 
 ## Usage
 
@@ -165,15 +191,21 @@ Usage:
 
 ### `easy_ydl`
 
-This command is implemented as below.
+This command is implemented as below. If you don't understand the script (since you're not familiar with [*shell script*](https://en.wikipedia.org/wiki/Shell_script)), see [Example 2](#example-2) for examples.
 ```bash
 $ cat easy_ydl
 #!/usr/bin/env sh
 file="./.ydl_video_id_list.txt"
-get_video_id "$1" "$2" "${file}" && ydl "${file}"
+if [ $# = 0 ]; then
+    ydl "${file}"
+else
+    get_video_id "$1" "$2" "${file}" && ydl "${file}"
+fi
 ```
 
-## Installation
+## Build
+
+### Tested Environment
 
 The program is tested under
 
@@ -182,6 +214,8 @@ The program is tested under
 - [Arch Linux ARM](https://archlinuxarm.org/)
 
 - [Linux Mint 19](https://linuxmint.com/)
+
+- [OS X 10.10 Yosemite](https://en.wikipedia.org/wiki/OS_X_Yosemite)
 
 ### Requirement
 
@@ -240,6 +274,10 @@ $ make uninstall
 ```
 
 ## Q&A
+
+- `make` fails with the error message "*Makefile:16: *** missing separator.  Stop.*". How can I solve it?
+
+You may encounter this problem on macOS. In that case, first execute `brew install make` and then use `gmake` instead of `make`.
 
 - Do I have to prepare *N* list files if I'd like to track *N* channels?
 

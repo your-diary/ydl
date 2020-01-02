@@ -2,7 +2,24 @@
 
 この文書は、オリジナルの[README.md](./README.md)(英語)の日本語訳です。特に理由が無ければ、オリジナルを参照することをおすすめします。
 
-## はじめに
+## 目次
+
+1. [はじめに](#introduction)
+    1. [*ydl*とは](#what-can-ydl-do)
+    2. [例1](#example-1)
+    3. [例2](#example-2)
+2. [用法](#usage)
+    1. [`get_video_id`](#get_video_id)
+    2. [`ydl`](#ydl)
+    3. [`easy_ydl`](#easy_ydl)
+3. [ビルド](#build)
+    1. [テスト環境](#tested-environment)
+    2. [要件](#requirement)
+    3. [準備](#preparation)
+    4. [インストール](#installation)
+4. [Q&A](#qa)
+
+## はじめに<a name="introduction"></a>
 
 ### *ydl*とは
 
@@ -129,16 +146,25 @@ Deleting original file Group slofie on iPhone 11 — Apple_2019-12-28T20:00:04.0
 
 ### 例2<a name="example-2"></a>
 
-`get_video_id`と`ydl`の組み合わせを使うことは十分に簡単ですが、二つのコマンドを入力したり、良いファイル名を考えたり、あるいはそれを手動で引数として渡すことは、ときに面倒に思えるかも知れません。そんなとき、もしリストに紐付けられたファイル名を決して気にしないのならば、単に`easy_ydl`コマンドを使うことができます。[用法](#usage)で説明するように、
+`get_video_id`と`ydl`の組み合わせを使うことは十分に簡単ですが、二つのコマンドを入力したり、良いファイル名を考えたり、あるいはそれを手動で引数として渡すことは、ときに面倒に思えるかも知れません。そんなとき、もしリストに紐付けられたファイル名を決して気にしないのならば、単に`easy_ydl`コマンドを使うことができます。例えば、次の二つは等価です。
 ```bash
 $ easy_ydl --username Apple
 ```
-
-は次のコマンドと等価です。
 ```bash
 $ file="./.ydl_video_id_list.txt"
 $ get_video_id --username Apple "${file}" && ydl "${file}"
 ```
+
+また、次の二つも等価です。
+```bash
+$ easy_ydl
+```
+```bash
+$ file="./.ydl_video_id_list.txt"
+$ ydl "${file}"
+```
+
+詳細については[用法](#easy_ydl)を参照してください。
 
 ## 用法<a name="usage"></a>
 
@@ -165,15 +191,21 @@ Usage:
 
 ### `easy_ydl`
 
-このコマンドは、次のように実装されています。
+このコマンドは、次のように実装されています。([*シェルスクリプト*](https://en.wikipedia.org/wiki/Shell_script)に不慣れなために)スクリプトが理解できない場合、[Example 2](#example-2)から例が見られます。
 ```bash
 $ cat easy_ydl
 #!/usr/bin/env sh
 file="./.ydl_video_id_list.txt"
-get_video_id "$1" "$2" "${file}" && ydl "${file}"
+if [ $# = 0 ]; then
+    ydl "${file}"
+else
+    get_video_id "$1" "$2" "${file}" && ydl "${file}"
+fi
 ```
 
-## インストール
+## ビルド<a name="build"></a>
+
+### テスト環境<a name="tested-environment"></a>
 
 このプログラムは、以下の環境下でテストされています。
 
@@ -183,7 +215,9 @@ get_video_id "$1" "$2" "${file}" && ydl "${file}"
 
 - [Linux Mint 19](https://linuxmint.com/)
 
-### 要件
+- [OS X 10.10 Yosemite](https://en.wikipedia.org/wiki/OS_X_Yosemite)
+
+### 要件<a name="requirement"></a>
 
 - POSIX互換のシェル(例えば[bash](https://www.gnu.org/software/bash/))
 
@@ -195,7 +229,7 @@ get_video_id "$1" "$2" "${file}" && ydl "${file}"
 
 - [youtube-dl](https://ytdl-org.github.io/youtube-dl/index.html)
 
-### 準備
+### 準備<a name="preparation"></a>
 
 1. [*YouTube Data API*](https://developers.google.com/youtube)のAPIキーを取得する。.
 
@@ -227,7 +261,7 @@ $ head -n 1 get_video_id easy_ydl
 - 十分に高い確率で、Python 3インタープリタの名前は`python3`ではありません。その場合、`python3`を正しい名前(もしかすると`python`)に置き換えてください。
 
 
-### インストール
+### インストール<a name="installation"></a>
 
 - インストール
 ```bash
@@ -240,6 +274,10 @@ $ make uninstall
 ```
 
 ## Q&A
+
+- `make`がエラーメッセージ"*Makefile:16: *** missing separator.  Stop.*"と共に失敗します。どうすれば解決できますか。
+
+macOSにおいて、この問題に直面するかも知れません。その場合、まず`brew install make`を実行して、それから`make`の代わりに`gmake`を使ってください。
 
 - *N*個のチャンネルを追跡するために、*N*個のリストファイルを用意する必要がありますか。
 
