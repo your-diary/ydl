@@ -1,2 +1,4 @@
 - Necessity of passing `<playlist spec>` argument every time seems inconvenient. We may want to store `<playlist spec>` in a video id list file and let programs read the information.
 
+- Allow users to pass any arguments (e.g. `--extract-audio`) to `youtube-dl`.
+
