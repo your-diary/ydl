@@ -22,18 +22,38 @@ namespace prm {
         }
     }
 
-    //convert halfwidth slashes in `str` to fullwidth slashes
-    string fullwidthize_slashes(string str) {
+    //Repeatedly replace `old_part` with `new_part` in `str`.
+    void replace(string &str, const string &old_part, const string &new_part) {
         string::size_type index = 0;
         while (true) {
-            index = str.find('/', index);
+            index = str.find(old_part, index);
             if (index == string::npos) {
                 break;
             } else {
-                str.replace(index, 1, "／");
+                str.replace(index, old_part.size(), new_part);
             }
+            index += new_part.size();
         }
+    }
+
+    string make_up_title(string str) {
+
+        //convert halfwidth slashes in `str` to fullwidth slashes
+        {
+            string old_part = "/";
+            string new_part = "／";
+            prm::replace(str, old_part, new_part);
+        }
+
+        //escape single quotes (replace ' with '"'"')
+        {
+            string old_part = "'";
+            string new_part = "'\"'\"'";
+            prm::replace(str, old_part, new_part);
+        }
+
         return str;
+
     }
 
 }
@@ -101,7 +121,7 @@ int main(int argc, char **argv) {
 
         cout << "------------ [" << download_index << "/" << num_should_download << "] " << video_id_list[i] << " start ------------\n";
 
-        string title = prm::fullwidthize_slashes(title_list[i]);
+        string title = prm::make_up_title(title_list[i]);
 
         ostringstream command;
         command << "youtube-dl" << " "
