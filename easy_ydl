@@ -1,11 +1,7 @@
 #!/usr/bin/env sh
 
 file="./.ydl_video_id_list.txt"
-if [ $# = 0 ]; then
-    ydl "${file}"
-else
-    get_video_id "$1" "$2" "${file}" && ydl "${file}"
-fi
+get_video_id "${file}" "$@" && ydl "${file}"
 
 # vim: syntax=sh
 

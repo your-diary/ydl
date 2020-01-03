@@ -2,17 +2,26 @@ using namespace std;
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <algorithm>
 #include <vector>
 #include <csignal>
+
+#define NDEBUG
 
 namespace prm {
 
     const char comment_char = '#';
+    const char prefix_for_option_array_element = '\'';
+    const char prefix_for_youtube_dl_option_array_element = '"';
 
     const string URL_prefix = "https://www.youtube.com/watch?v=";
 
     volatile sig_atomic_t has_SIGINT_caught = false;
 //     volatile sig_atomic_t has_SIGUSR1_caught = false;
+
+    void print_usage(const char *program_name) {
+        cout << "Usage:\n  " << program_name << " <input file name> [<option(s) to `youtube-dl`>]" << "\n";
+    }
 
     void signal_handler(int signal_id) {
         if (signal_id == SIGINT) {
@@ -63,41 +72,73 @@ int main(int argc, char **argv) {
     signal(SIGINT, prm::signal_handler);
     signal(SIGUSR1, prm::signal_handler);
 
-    if (argc != 2) {
-        cout << "Usage:\n  " << argv[0] << " <input file name>" << "\n";
+    if (argc == 1) {
+        prm::print_usage(argv[0]);
         return 1;
     }
+
+    const char *input_output_file = argv[1];
+
+    if (input_output_file[0] == '-') { //-h, --help
+        prm::print_usage(argv[0]);
+        return 0;
+    }
+
+    #ifndef NDEBUG
+        cout << "This is a debug (dry-run) mode.\n";
+    #endif
+
+    vector<string> option_list; //contains options to `get_video_id`
+    vector<string> youtube_dl_option_list; //contains options to `youtube-dl`
 
     vector<string> video_id_list;
     vector<string> title_list;
 
-    string video_id;
-    string title;
-
     //parse the input file
     {
 
-        ifstream ifs(argv[1]);
+        ifstream ifs(input_output_file);
         if (!ifs) {
-            cout << "Couldn't open the file [ " << argv[1] << " ].\n";
+            cout << "Couldn't open the file [ " << input_output_file << " ].\n";
             return 1;
         }
 
         while (true) {
 
-            getline(ifs, video_id, ' ');
-            getline(ifs, title);
-
+            string line;
+            getline(ifs, line);
             if (!ifs) {
                 break;
             }
 
-            video_id_list.push_back(video_id);
-            title_list.push_back(title);
+            if (line[0] == prm::prefix_for_option_array_element) {
+                option_list.push_back(line);
+            } else if (line[0] == prm::prefix_for_youtube_dl_option_array_element) {
+                youtube_dl_option_list.push_back(line);
+            } else {
+                string::size_type index = line.find(' ');
+                if (index == string::npos) {
+                    cout << "An error occurred while parsing the line [ " << line << " ]\n";
+                    return 1;
+                }
+                video_id_list.push_back(string(line.begin(), line.begin() + index));
+                title_list.push_back(string(line.begin() + index + 1, line.end()));
+            }
 
         }
 
         ifs.close();
+
+    }
+
+    //process `<option(s) to `youtube-dl`>`
+    for (int i = 2; i < argc; ++i) {
+
+        const string option_to_youtube_dl = prm::prefix_for_youtube_dl_option_array_element + string(argv[i]);
+
+        if (find(youtube_dl_option_list.begin(), youtube_dl_option_list.end(), option_to_youtube_dl) == youtube_dl_option_list.end()) { //avoid duplication
+            youtube_dl_option_list.push_back(option_to_youtube_dl);
+        }
 
     }
 
@@ -127,11 +168,25 @@ int main(int argc, char **argv) {
         command << "youtube-dl" << " "
                 << "'" << prm::URL_prefix << video_id_list[i] << "'" << " "
                 << "--output" << " " << "'" << title << ".%(ext)s" << "'";
+        for (int i = 0; i < youtube_dl_option_list.size(); ++i) {
+            command << " " << string(youtube_dl_option_list[i].begin() + 1, youtube_dl_option_list[i].end());
+        }
 
-        exit_status_list[i] = system(command.str().c_str());
+        #ifndef NDEBUG
+            cout << command.str() << "\n";
+            exit_status_list[i] = 0;
+        #else
+            exit_status_list[i] = system(command.str().c_str());
+        #endif
 
         if (exit_status_list[i] != 0 || prm::has_SIGINT_caught == true) {
-            cout << "--------- [" << download_index << "/" << num_should_download << "] " << video_id_list[i] << " interrupted ---------\n";
+            cout << "----------- [" << download_index << "/" << num_should_download << "] " << video_id_list[i] << " failed ------------\n";
+            if (i == 0 && argc > 2) {
+                cout << "Failed in downloading the very first video.\n";
+                cout << "It is suspected a command-line argument is incorrect.\n";
+                cout << "Exiting without touching the file [ " << input_output_file << " ]...\n";
+                return 1;
+            }
             break;
         }
 
@@ -142,10 +197,22 @@ int main(int argc, char **argv) {
     //output to the input file
     {
 
-        ofstream ofs(argv[1]);
+        #ifndef NDEBUG
+            ofstream ofs("/dev/stdout");
+        #else
+            ofstream ofs(input_output_file);
+        #endif
         if (!ofs) {
-            cout << "Couldn't open file [ " << argv[1] << " ].\n";
+            cout << "Couldn't open file [ " << input_output_file << " ].\n";
             return 1;
+        }
+
+        for (const string &i : option_list) {
+            ofs << i << "\n";
+        }
+
+        for (const string &i : youtube_dl_option_list) {
+            ofs << i << "\n";
         }
 
         bool should_comment_out = true;
