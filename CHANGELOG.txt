@@ -2,5 +2,7 @@ v1.0.0
     - This is the first release.
 v1.1.0
     - You have this version now.
-    - ...
+    - `README.md` have much more detailed information.
+    - You don't have to repeatedly pass the same arguments because an instruction file memorizes the options when they are first passed.
+    - You can by-pass any options to `youtube-dl`.
 
