@@ -149,13 +149,20 @@ def get_video_title(video_id, should_append_uploaded_date = False):
 if (__name__ == "__main__"):
 
     usage_message = "Usage:\n\
-  " + sys.argv[0] + " <playlist spec> <output file name>\n\
+  " + sys.argv[0] + " <output file name> [<option(s)>]\n\
 \n\
-<playlist spec>:\n\
-  --username <user name>         specify all uploaded videos by <user name>\n\
-  --channel-id <channel id>      specify all uploaded videos in <channel id>\n\
-  --playlist-id <playlist id>    specify all videos in <playlist id>\
+Option:\n\
+  --username <user name>         track all uploaded videos by <user name>\n\
+  --channel-id <channel id>      track all uploaded videos in <channel id>\n\
+  --playlist-id <playlist id>    track all videos in <playlist id>\n\
+  --with-time                    append uploaded time to a video title\n\
+  --no-time                      cancel `--with-time`\n\
+  -h, --help                     show this help\
 "
+
+    if (len(sys.argv) == 1 or sys.argv[1][0] == '-'): #-h, --help
+        print(usage_message)
+        sys.exit(0)
 
     print("Reading an API key from [ {} ]".format(api_key_file))
     try:
@@ -167,64 +174,201 @@ if (__name__ == "__main__"):
         print("An error occurred while opening [ {} ].".format(api_key_file))
         sys.exit(1)
 
-    if (len(sys.argv) != 4):
-        print(usage_message)
-        sys.exit(0)
+    input_output_file = sys.argv[1]
 
-    if (sys.argv[1] == "--username"):
-        id_type = "username"
-    elif (sys.argv[1] == "--channel-id"):
-        id_type = "channel_id"
-    elif (sys.argv[1] == "--playlist-id"):
-        id_type = "playlist_id"
-        playlist_id = sys.argv[2]
-    else:
-        print("Invalid option [ {} ] was passed.".format(sys.argv[1]))
-        print(usage_message)
-        sys.exit(1)
+    #parse an input file {
 
-    already_retrieved_video_id_list = []
+    option_array = []
+
+    youtube_dl_option_list = []
+
+    id_type_array = []
+    id_array = []
+
+    already_retrieved_video_id_list = [] #with a number sign '#' omitted and without a title
+    already_retrieved_video_id_list_original = [] #as it is
+
     try:
-        with open(sys.argv[3], "r") as f_in:
+
+        with open(input_output_file, "r") as f_in:
+
             contents = f_in.readlines()
+
             for line in contents:
-                video_id = line.split(' ')[0]
-                if (video_id[0] == '#'):
-                    video_id = video_id[1:]
-                already_retrieved_video_id_list.append(video_id)
+
+                element_array = line.split(' ')
+
+                if (element_array[0][0] == "'"): #option line
+
+                    option = element_array[0][1:]
+
+                    if (option == "--username"):
+                        id_type_array.append("username")
+                        id_array.append(element_array[1][:-1])
+                    elif (option == "--channel-id"):
+                        id_type_array.append("channel_id")
+                        id_array.append(element_array[1][:-1])
+                    elif (option == "--playlist-id"):
+                        id_type_array.append("playlist_id")
+                        id_array.append(element_array[1][:-1])
+                    else:
+                        option_array.append(element_array[0][1:])
+                        for i in range(1, len(element_array)):
+                            option_array.append(element_array[i])
+                        option_array[-1] = option_array[-1][:-1] #omit last newline
+
+                elif (element_array[0][0] == '"'): #option to `youtube-dl` line
+
+                    youtube_dl_option_list.append(line) #store it as it is
+
+                else: #video id and title line
+
+                    video_id = element_array[0]
+                    if (video_id[0] == '#'):
+                        video_id = video_id[1:]
+                    already_retrieved_video_id_list.append(video_id)
+                    already_retrieved_video_id_list_original.append(line)
+
     except:
+
         pass
 
-    if (id_type != "playlist_id"):
-        print("Retrieving the playlist id...")
-        playlist_id = get_uploaded_videos_playlist_id(id_type, sys.argv[2])
-        if (playlist_id == None):
+    #} parse an input file
+
+    #option parser {
+
+    should_append_uploaded_date_to_title = False #--with-time, --no-time
+
+    for i in range(2, len(sys.argv)): #`2` because `sys.argv[1]` is `<output file name>`.
+        option_array.append(sys.argv[i])
+
+    i = 0
+    while (True):
+
+        if (not i < len(option_array)):
+            break
+
+        option = option_array[i]
+        has_error_occurred = False
+
+        if (option == "--username" or option == "--channel-id" or option == "--playlist-id"):
+
+            i += 1
+
+            if (i < len(option_array)):
+                if (not option_array[i] in id_array): #avoid duplication
+                    id_array.append(option_array[i])
+                    if (option == "--username"):
+                        id_type_array.append("username")
+                    elif (option == "--channel-id"):
+                        id_type_array.append("channel_id")
+                    elif (option == "--playlist-id"):
+                        id_type_array.append("playlist_id")
+            else:
+                has_error_occurred = True
+
+        elif (option == "--with-time"):
+
+            should_append_uploaded_date_to_title = True
+
+        elif (option == "--no-time"):
+
+            should_append_uploaded_date_to_title = False
+
+        else:
+            
+            print("An unknown option [ {} ] was passed.".format(option))
             sys.exit(1)
 
-    print("Retrieving video ids...")
-    video_id_list = get_all_video_id_in_playlist(playlist_id, already_retrieved_video_id_list, True)
-    if (video_id_list == None):
-        sys.exit(1)
-    video_id_list.reverse() #Reverse the order so that the first element corresponds to the oldest video.
+        if (has_error_occurred):
+            print("An error occurred while parsing the option [ {} ].".format(option))
+            sys.exit(1)
 
-    if (len(video_id_list) == 0):
-        print("No new video id is appended to [ {} ].".format(sys.argv[3]))
-    else:
-        print("Opening [ {} ]...".format(sys.argv[3]))
-        try:
-            with open(sys.argv[3], "a") as f_out:
-                print("Appending {} new video ids to the file...".format(len(video_id_list)))
-                for i in video_id_list:
+        i += 1
+
+#     #for debug
+#     print("youtube_dl_option_list:", youtube_dl_option_list)
+#     print("id_type_array:", id_type_array)
+#     print("id_array:", id_array)
+#     print("option_array:", option_array)
+#     print("already_retrieved_video_id_list:", already_retrieved_video_id_list)
+#     print("already_retrieved_video_id_list_original:", already_retrieved_video_id_list_original)
+#     print("should_append_uploaded_date_to_title:", should_append_uploaded_date_to_title)
+#     sys.exit(1)
+
+    #} option parser
+
+    new_video_id_list = [] #contains newly retrieved video ids
+
+    for i in range(0, len(id_type_array)):
+        
+        print("----- [{}/{}] {} ({}) start -----".format(i + 1, len(id_type_array), id_array[i], id_type_array[i]))
+
+        if (id_type_array[i] == "playlist_id"):
+            playlist_id = id_array[i]
+        else:
+            print("Retrieving the playlist id...")
+            playlist_id = get_uploaded_videos_playlist_id(id_type_array[i], id_array[i])
+            if (playlist_id == None):
+                sys.exit(1)
+
+        print("Retrieving video ids...")
+        new_video_id_list_tmp = get_all_video_id_in_playlist(playlist_id, already_retrieved_video_id_list, True)
+        if (new_video_id_list_tmp == None):
+            sys.exit(1)
+        new_video_id_list_tmp.reverse() #Reverse the order so that the first element corresponds to the oldest video.
+
+        for id in new_video_id_list_tmp:
+            new_video_id_list.append(id)
+
+        print("------ [{}/{}] {} ({}) end ------".format(i + 1, len(id_type_array), id_array[i], id_type_array[i]))
+
+    print("Opening [ {} ]...".format(input_output_file))
+
+    try:
+
+#         with open("/dev/stdout", "w") as f_out: #for debug
+        with open(input_output_file, "w") as f_out:
+
+            for i in range(0, len(id_array)):
+                f_out.write("'")
+                if (id_type_array[i] == "username"):
+                    f_out.write("--username")
+                elif (id_type_array[i] == "channel_id"):
+                    f_out.write("--channel-id")
+                elif (id_type_array[i] == "playlist_id"):
+                    f_out.write("--playlist-id")
+                f_out.write(" ")
+                f_out.write(id_array[i])
+                f_out.write("\n")
+
+            if (should_append_uploaded_date_to_title):
+                f_out.write("'--with-time\n")
+
+            for i in youtube_dl_option_list:
+                f_out.write(i)
+
+            for i in already_retrieved_video_id_list_original:
+                f_out.write(i)
+
+            if (len(new_video_id_list) == 0):
+                print("No new video id is appended to [ {} ].".format(input_output_file))
+            else:
+                print("Appending {} new video ids to the file...".format(len(new_video_id_list)))
+                for i in new_video_id_list:
                     title = get_video_title(i, True)
                     if (title == None):
                         continue
                     else:
                         f_out.write(i + " " + title + "\n")
-                print("Done.")
-        except Exception as e:
-            print(e)
-            print("An error occurred while opening [ {} ].".format(sys.argv[3]))
-            sys.exit(1)
+
+            print("Done.")
+
+    except Exception as e:
+
+        print(e)
+        print("An error occurred while opening [ {} ].".format(input_output_file))
+        sys.exit(1)
 
 # vim: syntax=py
 
