@@ -1,13 +1,13 @@
-# *ydl*, a front end for `youtube-dl`
+# *ydl*, a cross-platform front end for `youtube-dl`
 
 日本語版 :jp: が[README_ja.md](./README_ja.md)から見られます。 (See [README_ja.md](./README_ja.md) for a Japanese :jp: version.)
 
-This document is for ydl v1.1.x. Refer to another document for an explanation about another version of ydl.
+This document is for ydl <ins>**v1.1.x**</ins>. Refer to another document for an explanation about another version of ydl.
 
 ## Index
 
 1. [Introduction](#introduction)
-    1. [What can *ydl* do?](#what-can-ydl-do)
+    1. [What is *ydl*?](#what-is-ydl)
     2. [Example 1](#example-1)
     3. [Example 2](#example-2)
 2. [Usage](#usage)
@@ -15,6 +15,8 @@ This document is for ydl v1.1.x. Refer to another document for an explanation ab
     2. [`ydl`](#ydl)
     3. [`easy_ydl`](#easy_ydl)
 3. [Instruction File](#instruction-file)
+    1. [About](#about)
+    2. [Syntax](#syntax)
 4. [Build](#build)
     1. [Tested Environment](#tested-environment)
     2. [Requirement](#requirement)
@@ -25,9 +27,9 @@ This document is for ydl v1.1.x. Refer to another document for an explanation ab
 
 ## Introduction
 
-### What can *ydl* do?
+### What is *ydl*?
 
-*ydl* is a front end for [`youtube-dl`](https://ytdl-org.github.io/youtube-dl/index.html). ydl consists of two programs: `get_video_id` and `ydl`.
+*ydl* is a front end for [`youtube-dl`](https://ytdl-org.github.io/youtube-dl/index.html). ydl is cross-platform (see [Tested Environment](#tested-environment)) and works with no GUI. ydl consists of two programs: `get_video_id` and `ydl`.
 
 `get_video_id` constructs a list of video ids associated with a username, a channel id or a playlist id (hereafter, we call them *target*s), and writes the list to a specified file. Each video id is appended to the file as long as it is not found in the file. This makes it possible, if you in the past called `get_video_id` with the same arguments, to *update* the file.
 
@@ -214,7 +216,7 @@ Option:
 
 `ydl` reads a specified instruction file `<input file name>` to construct a list of video ids and then makes `youtube-dl` download videos according to the list. The file is usually prepared with `get_video_id` in advance. When a video is successfully downloaded, the video id corresponding to it is prepended with a number sign `#`, which indicates "you have already downloaded the video". By that, you can suspend and resume the operation (without re-downloading anything), or only download newly uploaded videos after updating the list file by `get_video_id`.
 
-Download is done with normal (i.e. with no option specified) `youtube-dl`. However, you can by-pass any and any number of arguments to `youtube-dl` by passing them as `<option(s) to youtube-dl>`. These options are appended to the instruction file and, when you in the future execute `ydl`, are automatically read.
+Download is done with normal (i.e. with no option specified) `youtube-dl`. However, you can by-pass any and any number of arguments to `youtube-dl` by passing them as `<option(s) to youtube-dl>`. These options are appended to the instruction file and, when you in the future execute `ydl`, are automatically read. Exceptionally, when downloading the very first video fails, the options are not appended because the failure may due to an invalid option you've specified. If there was no exception like that, you would be annoyed manually to remove the invalid option from an instruction file.
 
 Usage:
 ```bash
@@ -234,6 +236,36 @@ get_video_id "${file}" "$@" && ydl "${file}"
 ```
 
 ## Instruction File
+
+### About
+
+All commands composing ydl do their work according to an *instruction file*. This file includes these information to name a few.
+- Targets the file is tracking.
+- Options passed to `get_video_id`.
+- Options passed to `youtube-dl`.
+- Retrieved video ids.
+
+Except when you execute `easy_ydl` command, an instruction file to which the commands refer is specified as an command-line argument. See [Usage](#usage) about that. Though the file is usually created or modified by the commands, you can do them manually.
+
+### Syntax
+
+Syntax of an instruction file is simple.
+
+- `'<string>` (Example: `'--username Apple`, `'--with-time`)
+
+When you execute `get_video_id`, `<string>` is interpreted as an option in addition to command-line arguments.
+
+- `"<string>` (Example: `"--extract-audio`, `"--audio-format mp3`)
+
+When you execute `ydl`, `<string>` is passed to `youtube-dl` as it is. One useful technique is to specify `--extract-audio` which allows you to get only audio.
+
+- `<video id> <title>` (Example: `4FunXnJQxYU Apple Special Event. October 22, 2013.`)
+
+When you execute `ydl`, a video whose id is `<video id>` is downloaded with its file name set to `<title>.<extension>` where `<extension>` is an appropriate extension like `mp4`, `webm` or `mkv`. Note it is not rare that `<video id>` starts with a hyphen "-". This is the reason why an additional character like a single quote is prepended to store options. In many cases, `<title>` contains spaces.
+
+- `#<video id> <title>` (Example: `#4FunXnJQxYU Apple Special Event. October 22, 2013.`)
+
+This line lets ydl know which video you've already downloaded. When you execute `ydl`, a video whose id is `<video id>` is skipped. When you execute `get_video_id`, the same video id to `<video id>` is not appended to an instruction file and information about the video (e.g. the title) is not retrieved, which makes operations much faster. Do not remove the line with no reason.
 
 ## Build
 
@@ -327,8 +359,9 @@ Say you have a computer and a headless server which can be accessed by the compu
 ```bash
 $ ssh <host>
 
-$$ get_video_id --username Apple video_id_list.txt
+$$ get_video_id id.txt --username Apple
 Reading an API key from [ ~/.ydl_api_key ]
+----- [1/1] Apple (username) start -----
 Retrieving the playlist id...
 Retrieving video ids...
     [1/7] Done.
@@ -338,12 +371,13 @@ Retrieving video ids...
     [5/7] Done.
     [6/7] Done.
     [7/7] Done.
-Opening [ video_id_list.txt ]...
-Appending 315 new video ids to the file...
+------ [1/1] Apple (username) end ------
+Opening [ id.txt ]...
+Appending 314 new video ids to the file...
 Done.
 
-$$ ydl video_id_list.txt > ydl_log 2>&1 & #Execute as a background job and redirect all to `ydl_log` file.
-[1] 24535
+$$ ydl id.txt > ydl_log 2>&1 & #Execute as a background job and redirect all to `ydl_log` file.
+[1] 1377
 
 $$ disown #Now you can logout from the server without terminating the operation.
 ```
@@ -366,5 +400,9 @@ $$ kill -SIGINT 24742 #kill `youtube-dl` (not `ydl`)
 
 ## Contribution
 
-Contributions are welcome. When you would like to suggest a new feature or have found a bug, if you have a GitHub :octocat: account, please send a pull request or open an issue. If you don't, please send a mail :email: to [takahashi.manatsu@gmail.com](mailto:takahashi.manatsu@gmail.com).
+Contributions are all welcome.
+
+When you would like to suggest a new feature or have found a bug, if you have a GitHub :octocat: account, please send a pull request or open an issue. If you don't, please send a mail :email: to [takahashi.manatsu@gmail.com](mailto:takahashi.manatsu@gmail.com).
+
+Also, translating this document is very much appreciated.
 

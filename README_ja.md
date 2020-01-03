@@ -1,8 +1,8 @@
 # *ydl*, a front end for `youtube-dl`
 
-この文書は、オリジナルの[README.md](./README.md)(英語)の日本語訳 :jp: です。特に理由が無ければ、オリジナルを参照することをおすすめします。 (This document is a Japanese :jp: translation of original [README.md](./README.md).)
+この文書は、オリジナルの[README.md](./README.md)(英語)の日本語訳 :jp: です。訳が追いついていない場合が多々あるため、特に理由が無ければ、オリジナルを参照することをおすすめします。 (This document is a Japanese :jp: translation of original [README.md](./README.md).)
 
-この文書は、ydl v1.0.xのためのものです。他のバージョンのydlに関する説明については、他の文書を参照してください。
+この文書は、ydl <ins>**v1.0.x**</ins>のためのものです。他のバージョンのydlに関する説明については、他の文書を参照してください。場合によっては、英語版しか用意されていません。
 
 ## 目次
 
@@ -337,5 +337,9 @@ $$ kill -SIGINT 24742 #(`ydl`ではなく)`youtube-dl`をキルする
 
 ## コントリビューション<a name="contribution"></a>
 
-コントリビューションは歓迎します。新機能を提案したかったり、バグを発見したとき、もしGitHub :octocat: アカウントを持っているならば、プルリクエストを送信するか、イッシューを開いてください。持っていないのであれば、[takahashi.manatsu@gmail.com](mailto:takahashi.manatsu@gmail.com)にメール :email: をお送りください。
+コントリビューションは全く歓迎します。
+
+新機能を提案したかったり、バグを発見したとき、もしGitHub :octocat: アカウントを持っているならば、プルリクエストを送信するか、イッシューを開いてください。持っていないのであれば、[takahashi.manatsu@gmail.com](mailto:takahashi.manatsu@gmail.com)にメール :email: をお送りください。
+
+また、この文書を訳していただける方を募集しています。
 
