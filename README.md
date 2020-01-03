@@ -1,6 +1,8 @@
-# *ydl*, a front end for `youtube-dl`
+# *ydl*, a cross-platform front end for `youtube-dl`
 
 日本語版 :jp: が[README_ja.md](./README_ja.md)から見られます。 (See [README_ja.md](./README_ja.md) for a Japanese :jp: version.)
+
+This document is for ydl <ins>**v1.0.x**</ins>. Refer to another document for an explanation about another version of ydl.
 
 ## Index
 
@@ -24,7 +26,7 @@
 
 ### What can *ydl* do?
 
-*ydl* is a front end for [`youtube-dl`](https://ytdl-org.github.io/youtube-dl/index.html). ydl consists of two programs: `get_video_id` and `ydl`.
+*ydl* is a front end for [`youtube-dl`](https://ytdl-org.github.io/youtube-dl/index.html). ydl is cross-platform (see [Tested Environment](#tested-environment)) and works with no GUI. ydl consists of two programs: `get_video_id` and `ydl`.
 
 `get_video_id` constructs a list of video ids associated with a username, a channel id or a playlist id, and writes the list to a specified file. Each video id is appended to the file as long as it is not found in the file. This makes it possible, if you in the past called `get_video_id` with the same arguments, to *update* the file.
 
