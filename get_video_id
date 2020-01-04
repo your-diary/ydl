@@ -357,6 +357,7 @@ Option:\n\
                 print("Appending {} new video ids to the file...".format(len(new_video_id_list)))
                 for i in new_video_id_list:
                     title = get_video_title(i, True)
+                    title = title.replace('\n', ' ') #Rarely a video title has a newline in it, which breaks syntax of an instruction file.
                     if (title == None):
                         continue
                     else:

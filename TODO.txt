@@ -1,2 +1,3 @@
 - Translating the latest `README.md` into Japanese (`README_ja.md`).
+- Add support for Watch Later
 
