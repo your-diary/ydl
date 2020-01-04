@@ -116,6 +116,9 @@ int main(int argc, char **argv) {
             } else if (line[0] == prm::prefix_for_youtube_dl_option_array_element) {
                 youtube_dl_option_list.push_back(line);
             } else {
+                if (line[0] == '\0') { //ignore empty lines
+                    continue;
+                }
                 string::size_type index = line.find(' ');
                 if (index == string::npos) {
                     cout << "An error occurred while parsing the line [ " << line << " ]\n";
