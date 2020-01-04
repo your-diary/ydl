@@ -110,7 +110,7 @@ def get_all_video_id_in_playlist(playlist_id, already_retrieved_video_id_list, s
         for video in json_dict['items']:
             video_id = video['contentDetails']['videoId']
             if (video_id in already_retrieved_video_id_list):
-                return video_id_list
+                continue
             else:
                 video_id_list.append(video_id)
 
