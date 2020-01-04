@@ -155,6 +155,8 @@ int main(int argc, char **argv) {
     }
     unsigned download_index = 0;
 
+    bool has_download_failed_or_interrupted = false;
+
     for (int i = 0; i < video_id_list.size(); ++i) {
 
         if (video_id_list[i][0] == prm::comment_char) {
@@ -190,6 +192,7 @@ int main(int argc, char **argv) {
                 cout << "Exiting without touching the file [ " << input_output_file << " ]...\n";
                 return 1;
             }
+            has_download_failed_or_interrupted = true;
             break;
         }
 
@@ -231,6 +234,12 @@ int main(int argc, char **argv) {
 
         ofs.close();
 
+    }
+
+    if (has_download_failed_or_interrupted) {
+        return 1;
+    } else {
+        return 0;
     }
 
 }
