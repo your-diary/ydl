@@ -157,6 +157,7 @@ Option:\n\
   --playlist-id <playlist id>    track all videos in <playlist id>\n\
   --with-time                    append uploaded time to a video title\n\
   --no-time                      cancel `--with-time`\n\
+  --verbose                      enable verbose output\n\
   -h, --help                     show this help\
 "
 
@@ -238,6 +239,7 @@ Option:\n\
     #option parser {
 
     should_append_uploaded_date_to_title = False #--with-time, --no-time
+    is_verbose_mode = False #--verbose
 
     for i in range(2, len(sys.argv)): #`2` because `sys.argv[1]` is `<output file name>`.
         option_array.append(sys.argv[i])
@@ -274,6 +276,10 @@ Option:\n\
         elif (option == "--no-time"):
 
             should_append_uploaded_date_to_title = False
+
+        elif (option == "--verbose"):
+
+            is_verbose_mode = True
 
         else:
             
@@ -345,6 +351,9 @@ Option:\n\
             if (should_append_uploaded_date_to_title):
                 f_out.write("'--with-time\n")
 
+            if (is_verbose_mode):
+                f_out.write("'--verbose\n")
+
             for i in youtube_dl_option_list:
                 f_out.write(i)
 
@@ -355,13 +364,18 @@ Option:\n\
                 print("No new video id is appended to [ {} ].".format(input_output_file))
             else:
                 print("Appending {} new video ids to the file...".format(len(new_video_id_list)))
-                for i in new_video_id_list:
-                    title = get_video_title(i, True)
+                for i in range(0, len(new_video_id_list)):
+                    if (is_verbose_mode):
+                        print("\r    [{}/{}] Done.".format(i + 1, len(new_video_id_list)), end = "")
+                    new_video_id = new_video_id_list[i]
+                    title = get_video_title(new_video_id, should_append_uploaded_date_to_title)
                     title = title.replace('\n', ' ') #Rarely a video title has a newline in it, which breaks syntax of an instruction file.
                     if (title == None):
                         continue
                     else:
-                        f_out.write(i + " " + title + "\n")
+                        f_out.write(new_video_id + " " + title + "\n")
+                if (is_verbose_mode):
+                    print()
 
             print("Done.")
 

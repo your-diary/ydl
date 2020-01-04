@@ -5,17 +5,20 @@ SHELL = /bin/bash
 override CXXFLAGS += -O3
 prefix := /usr/local
 
-binary_name := ydl
-source_name := ydl.cpp
+binary_list := ydl easy_ydl
+source_list := ydl.cpp easy_ydl.cpp
 
 .PHONY: all install uninstall clean
 
-all : $(binary_name)
+all : $(binary_list)
 
-$(binary_name) : $(source_name)
+$(word 1,$(binary_list)) : $(word 1,$(source_list))
     g++ $(CXXFLAGS) -o $@ $<
 
-install_list := $(binary_name) get_video_id easy_ydl
+$(word 2,$(binary_list)) : $(word 2,$(source_list))
+    g++ $(CXXFLAGS) -o $@ $<
+
+install_list := $(binary_list) get_video_id
 
 install : $(install_list)
     mkdir -p $(prefix)/bin
@@ -25,5 +28,5 @@ uninstall :
     rm $(addprefix $(prefix)/bin/,$(install_list))
 
 clean :
-    rm $(binary_name)
+    rm $(binary_list)
 
