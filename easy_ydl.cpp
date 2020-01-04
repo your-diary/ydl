@@ -1,15 +1,22 @@
 using namespace std;
 #include <iostream>
+#include <sstream>
 #include <vector>
 
+#define NDEBUG
+
 namespace prm {
+
+    const char *input_output_file = "./.ydl_video_id_list.txt";
+    const char *base_command_1 = "get_video_id";
+    const char *base_command_2 = "ydl";
 
     enum option_type { get_video_id, ydl };
 
     const string separator = "--";
 
     void print_usage(const char *program_name) {
-        cout << "Usage:\n";
+        cout << "Usage:\n  " << program_name << " [<option(s) to `get_video_id`>] [-- <option(s) to `ydl`>]\n";
     }
 
 }
@@ -23,6 +30,10 @@ int main(int argc, char **argv) {
             return 0;
         }
     }
+
+    #ifndef NDEBUG
+        cout << "This is a debug (dry-run) mode.\n";
+    #endif
 
     vector<string> get_video_id_option_array;
     vector<string> ydl_option_array;
@@ -42,20 +53,36 @@ int main(int argc, char **argv) {
         }
     }
 
+    ostringstream command_str;
+    command_str << prm::base_command_1 << " "
+                << "'" << prm::input_output_file << "'";
     for (int i = 0; i < get_video_id_option_array.size(); ++i) {
-        cout << get_video_id_option_array[i] << "\n";
+        command_str << " " << "'" << get_video_id_option_array[i] << "'";
     }
-    cout << "---\n";
-    for (int i = 0; i < ydl_option_array.size(); ++i) {
-        cout << ydl_option_array[i] << "\n";
-    }
+    #ifndef NDEBUG
+        cout << command_str.str() << "\n";
+    #else
+        cout << "Starting `" << prm::base_command_1 << "`...\n";
+        int exit_status = system(command_str.str().c_str());
+        if (exit_status != 0) {
+            return exit_status;
+        }
+        cout << "\n";
+    #endif
 
-// file="./.ydl_video_id_list.txt"
-// get_video_id "${file}" "$@" && ydl "${file}"
+    command_str.str("");
+    command_str << prm::base_command_2 << " "
+                << "'" << prm::input_output_file << "'";
+    for (int i = 0; i < ydl_option_array.size(); ++i) {
+        command_str << " " << "'" << ydl_option_array[i] << "'";
+    }
+    #ifndef NDEBUG
+        cout << command_str.str() << "\n";
+    #else
+        cout << "Starting `" << prm::base_command_2 << "`...\n";
+        exit_status = system(command_str.str().c_str());
+        return exit_status;
+    #endif
 
 }
-
-#if 0
-
-#endif
 

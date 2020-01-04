@@ -1,8 +1,12 @@
 v1.0.0
     - This is the first release.
 v1.1.0
-    - You have this version now.
     - `README.md` have much more detailed information.
     - You don't have to repeatedly pass the same arguments because an instruction file memorizes the options when they are first passed.
     - You can by-pass any options to `youtube-dl`.
+v1.1.1
+    - You have this version now.
+    - Changed language used to implement `easy_ydl` from `sh` to `C++` for flexibility.
+    - When you execute `easy_ydl`, you can pass not only options for `get_video_id` but also those for `ydl`.
+    - Added `--verbose` option to `get_video_id`.
 

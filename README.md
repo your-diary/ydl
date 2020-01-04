@@ -209,6 +209,7 @@ Option:
   --playlist-id <playlist id>    track all videos in <playlist id>
   --with-time                    append uploaded time to a video title
   --no-time                      cancel `--with-time`
+  --verbose                      enable verbose output
   -h, --help                     show this help
 ```
 
@@ -227,12 +228,24 @@ Usage:
 
 ### `easy_ydl`
 
-This command is implemented as below. If you don't understand the script (since you're not familiar with [*shell script*](https://en.wikipedia.org/wiki/Shell_script)), see [Example 2](#example-2) for examples.
+`easy_ydl` is just a wrapper of `get_video_id` and `ydl`. Whilst you shall specify an instruction file name in using `get_video_id` or `ydl`, no such an argument is needed to `easy_ydl` since it uses (i.e. creates or modifies) `.ydl_video_id_list.txt` file under a current directory as an instruction file.
+
+Generally, these two sets of commands are equivalent.
 ```bash
-$ cat easy_ydl
-#!/usr/bin/env sh
+easy_ydl A B C -- D E
+```
+```bash
 file="./.ydl_video_id_list.txt"
-get_video_id "${file}" "$@" && ydl "${file}"
+get_video_id "${file}" A B C && ydl "${file}" D E
+```
+
+In other words, options before a double hyphen `--` are passed to `get_video_id` and those after it are passed to `ydl`. See [Example 2](#example-2) for examples.
+
+Usage:
+```bash
+$ easy_ydl --help
+Usage:
+  easy_ydl [<option(s) to `get_video_id`>] [-- <option(s) to `ydl`>]
 ```
 
 ## Instruction File
@@ -309,23 +322,19 @@ $ echo "AIpaSyCaXPx0utk8HmM4a8PbYp_qeu7wOknGT3U" > ~/.ydl_api_key
 
 You can use `git clone <URL of this page>` command or press a download button on this webpage.
 
-3. Change shebang lines if needed.
+3. Change a shebang line if needed.
 
-There exists a [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix)) line in `get_video_id` and `easy_ydl`.
+There exists a [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix)) line in `get_video_id`.
 ```bash
-$ head -n 1 get_video_id easy_ydl
-==> get_video_id <==
+$ head -n 1 get_video_id
 #!/usr/bin/env python3
-
-==> easy_ydl <==
-#!/usr/bin/env sh
 ```
 
-Their contents may be inappropriate for your environment.
+Its contents may be inappropriate for your environment.
 
 - With low probability, `env` command is not located in `/usr/bin`. Check that with `which -a env` command or `type -a env` command. If the location is incorrect, replace `/usr/bin/env` with the correct path.
 
-- With sufficiently high probability, a name of Python 3 interpreter is not `python3`. In that case, replace `python3` with the correct name (possibly `python`).
+- With relatively high probability, a name of Python 3 interpreter is not `python3`. In that case, replace `python3` with the correct name (possibly `python`).
 
 ### Installation
 
