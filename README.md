@@ -8,8 +8,9 @@ This document is for ydl <ins>**v1.1.x**</ins>. Refer to another document for an
 
 1. [Introduction](#introduction)
     1. [What is *ydl*?](#what-is-ydl)
-    2. [Example 1](#example-1)
-    3. [Example 2](#example-2)
+    2. [I'm a Beginner / I Have No Time to Read This Long Documentation](#step_by_step_documentation)
+    3. [Example 1](#example-1)
+    4. [Example 2](#example-2)
 2. [Usage](#usage)
     1. [`get_video_id`](#get_video_id)
     2. [`ydl`](#ydl)
@@ -34,6 +35,11 @@ This document is for ydl <ins>**v1.1.x**</ins>. Refer to another document for an
 `get_video_id` constructs a list of video ids associated with a username, a channel id or a playlist id (hereafter, we call them *target*s), and writes the list to a specified file. Each video id is appended to the file as long as it is not found in the file. This makes it possible, if you in the past called `get_video_id` with the same arguments, to *update* the file.
 
 `ydl` reads a specified file to construct a list of video ids and then makes `youtube-dl` download videos according to the list. When a video is successfully downloaded, the video id corresponding to it is prepended with a number sign `#`, which indicates "you have already downloaded the video". By that, you can suspend and resume the operation (without re-downloading anything), or only download newly uploaded videos after updating the list file by `get_video_id`.
+
+<a name="step_by_step_documentation"></a>
+### I'm a Beginner / I Have No Time to Read This Long Documentation
+
+We offer a step by step documentation for beginners, which is completely independent of this exhaustive documentation. How to set up environment, how to install `ydl` and how to use it are explained in detail with dozens of screenshots. Visit our [website](http://ynn-note.com/articles/ydl/index.html) to read it.
 
 ### Example 1
 
