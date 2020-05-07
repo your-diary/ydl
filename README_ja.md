@@ -339,7 +339,7 @@ $$ kill -SIGINT 24742 #(`ydl`ではなく)`youtube-dl`をキルする
 
 コントリビューションは全く歓迎します。
 
-新機能を提案したかったり、バグを発見したとき、もしGitHub :octocat: アカウントを持っているならば、プルリクエストを送信するか、イッシューを開いてください。持っていないのであれば、[takahashi.manatsu@gmail.com](mailto:takahashi.manatsu@gmail.com)にメール :email: をお送りください。
+新機能を提案したかったり、バグを発見したとき、もしGitHub :octocat: アカウントを持っているならば、プルリクエストを送信するか、イッシューを開いてください。持っていないのであれば、[manatsu@your-diary.com](mailto:manatsu@your-diary.com)にメール :email: をお送りください。
 
 また、この文書を訳していただける方を募集しています。
 
